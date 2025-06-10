@@ -230,28 +230,7 @@ window.toggleReservedStatus = async function(bookId) {
     alert("Fehler beim Aktualisieren des Reservierungsstatus: " + error.message);
   }
 };
-snap.forEach(d => {
-  const data = d.data();
-  booksContainer.innerHTML += `
-    <div style="background-color: ${data.reserved ? '#ffdddd' : 'white'};">
-      <strong>${data.title}</strong> (${data.available ? "✓ Verfügbar" : "✗ Nicht verfügbar"})<br/>
-      Autor: ${data.author || "-"}<br/>
-      Verfügbar ab: ${data.availableFrom || "-"}<br/>
-      <img src="${data.cover || ''}" alt="Cover ${data.title}" style="max-width:100px; margin-top:5px;"/>
-      
-      <br/><label>Verfügbar ab ändern:
-      <input type="date" value="${data.availableFrom || ''}" id="date-${d.id}" />
-      <button onclick="updateAvailableFrom('${d.id}')">Datum aktualisieren</button>
-      </label>
 
-      <br/><button onclick="toggleReservedStatus('${d.id}')">${data.reserved ? "Zurücksetzen" : "Reservieren"}</button>
-    </div>
-  `;
-});
-
-          
-        } catch (e) {
-          console.error("Fehler beim Laden der Einstellungen:", e);
         }
       }
 
