@@ -125,6 +125,42 @@
         document.getElementById("thank-you-message").textContent = data.thankYouMessage || "Vielen Dank! Deine Buchungsanfrage wurde erfolgreich übermittelt. Du wirst bald informiert, ob das Buch zur gewünschten Zeit verfügbar ist.";
       }
     }
+// Bücher laden
+async function loadBooks() {
+  booksContainer.innerHTML = "Lade Bücher...";
+  try {
+    const snap = await getDocs(collection(db, "books"));
+    booksContainer.innerHTML = "";
+    if (snap.empty) {
+      booksContainer.innerHTML = "<p>Keine Bücher gefunden.</p>";
+      return;
+    }
+
+    // Bücher durchlaufen und anzeigen
+    snap.forEach(d => {
+      const data = d.data();
+      booksContainer.innerHTML += `
+        <div style="background-color: ${data.reserved ? '#ffdddd' : 'white'};">
+          <strong>${data.title}</strong> (${data.available ? "✓ Verfügbar" : "✗ Nicht verfügbar"})<br/>
+          Autor: ${data.author || "-"}<br/>
+          Verfügbar ab: ${data.availableFrom || "-"}<br/>
+          <img src="${data.cover || ''}" alt="Cover ${data.title}" style="max-width:100px; margin-top:5px;"/>
+          
+          <br/><label>Verfügbar ab ändern:
+          <input type="date" value="${data.availableFrom || ''}" id="date-${d.id}" />
+          <button onclick="updateAvailableFrom('${d.id}')">Datum aktualisieren</button>
+          </label>
+
+          <br/><button onclick="toggleReservedStatus('${d.id}')">${data.reserved ? "Zurücksetzen" : "Reservieren"}</button>
+        </div>
+      `;
+    });
+
+  } catch(e) {
+    booksContainer.innerHTML = "<p>Fehler beim Laden der Bücher.</p>";
+    console.error(e);
+  }
+}
 
     function showThankYouMessageIfNeeded() {
       const params = new URLSearchParams(window.location.search);
