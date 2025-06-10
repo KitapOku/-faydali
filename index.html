@@ -2,76 +2,66 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gemeindebibliothek</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <title>Bibliothek Admin Panel</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+    #admin-panel {
+      display: none;
+      margin-top: 2rem;
+    }
+    form > * {
+      display: block;
+      margin: 0.5rem 0;
+    }
+    #books > div {
+      border-bottom: 1px solid #ccc;
+      padding: 0.5rem 0;
+      cursor: pointer;
+    }
+    #books > div:hover {
+      background-color: #f0f0f0;
     }
   </style>
 </head>
-<body class="bg-gray-100 text-gray-900">
-  <header class="bg-white shadow p-4 flex justify-between items-center">
-    <h1 id="header-text" class="text-2xl font-bold">📚 Gemeindebibliothek</h1>
-    <div class="flex items-center gap-4">
-      <a href="https://www.instagram.com/ditibjugend.kreisunna/" target="_blank">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" class="h-8 w-8">
-      </a>
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://www.instagram.com/ditibjugend.kreisunna/" alt="QR Code" class="h-10 w-10">
-    </div>
-  </header>
+<body>
 
-  <main class="p-6">
-    <section data-aos="fade-up">
-      <h2 class="text-xl font-semibold mb-4">Verfügbare Bücher</h2>
-      <div id="books-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        <!-- Dynamisch geladene Bücher -->
-      </div>
-    </section>
+  <h1>Bibliothek Admin Panel</h1>
 
-    <section data-aos="fade-up" class="mt-10" id="borrow-section" style="display:none">
-  <h2 class="text-xl font-semibold mb-4">Buch ausleihen</h2>
-<form action="https://docs.google.com/forms/d/e/1FAIpQLSeszi7ZS-ZJwZYfqn-pqpIDJlR1H8NawEj8k3fmFqUApHuM4Q/formResponse" method="POST" target="_blank" class="space-y-4">
-  <!-- Verstecktes Feld für Buchtitel -->
-  <input id="book-title-input" name="entry.1234567890" type="hidden" />
+  <form id="login-form">
+    <h2>Login</h2>
+    <input name="email" type="email" placeholder="E-Mail" required />
+    <input name="password" type="password" placeholder="Passwort" required />
+    <button type="submit">Login</button>
+  </form>
 
-  <input name="entry.975934348" type="text" placeholder="Name" required class="w-full p-2 border rounded" />
-  <input name="entry.373130912" type="text" placeholder="Moschee / Gemeinde" required class="w-full p-2 border rounded" />
-  <input name="entry.1690679086" type="tel" placeholder="Mobilnummer" required class="w-full p-2 border rounded" />
-  <input name="entry.769733384" type="text" placeholder="Zeitraum" required class="w-full p-2 border rounded" />
-  
-  <p class="text-sm text-gray-600">📌 Hinweis: Verlängerungen sind möglich – einfach Bescheid geben</p>
-  <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Anfrage senden</button>
-</form>
+  <div id="admin-panel">
+    <h2>Bücher verwalten</h2>
 
+    <!-- Buchformular für das Hinzufügen neuer Bücher -->
+    <form id="book-form">
+      <input name="title" type="text" placeholder="Titel" required />
+      <input name="author" type="text" placeholder="Autor" />
+      <input name="cover" type="text" placeholder="Cover-URL" />
+      <label><input name="available" type="checkbox" /> Verfügbar</label>
+      <input name="availableFrom" type="date" />
+      <button type="submit">Buch hinzufügen</button>
+    </form>
 
-</section>
-
-
-    <section data-aos="fade-up" class="mt-10">
-      <p id="thank-you-message" class="bg-green-100 p-4 rounded text-green-800 hidden">
-        Vielen Dank! Deine Anfrag wurde erfolgreich übermittelt. Wir melden uns in Kürze bei dir.
-        Tesekkürler! Kisa zaman sonra sizinle iletisime gecicez :)
-      </p>
-    </section>
-  </main>
-
-  <footer class="bg-white p-4 mt-10 text-center text-sm text-gray-500">
-    <span id="footer-text">© 2025 Gemeindebibliothek – DITIB Jugend Kreis Unna
-                                         Bahadir Büyük</span>
-  </footer>
-
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>
-    AOS.init();
-  </script>
+    <!-- Bücher werden hier dynamisch geladen -->
+    <div id="books"></div>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
 
+    // Deine Firebase-Konfiguration hier einfügen:
     const firebaseConfig = {
       apiKey: "AIzaSyBBGhn-V58ufgbSGsoL6lLONX09QJKm2sE",
       authDomain: "bibliothek-38373.firebaseapp.com",
@@ -83,99 +73,104 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
 
-   async function loadBooks() {
-  const container = document.getElementById("books-container");
-  container.innerHTML = "";
+    document.addEventListener("DOMContentLoaded", () => {
+      const loginForm = document.getElementById("login-form");
+      const adminPanel = document.getElementById("admin-panel");
+      const bookForm = document.getElementById("book-form");
+      const booksContainer = document.getElementById("books");
 
-  const querySnapshot = await getDocs(collection(db, "books"));
-  querySnapshot.forEach(docSnap => {
-    const book = docSnap.data();
-    const card = document.createElement("div");
-    card.className = "bg-white p-4 rounded-xl shadow hover:shadow-md transition cursor-pointer";
-   card.innerHTML = `
-  <img src="${book.cover || 'https://via.placeholder.com/150x220?text=Kein+Cover'}" alt="Buchcover" class="rounded mb-2 w-full h-auto max-h-56 object-cover" />
-  <h3 class="text-lg font-bold">${book.title}</h3>
-  <p class="text-sm">Autor: ${book.author}</p>
-  <p class="text-sm text-gray-700">${book.availableFrom ? 'Verfügbar ab: ' + book.availableFrom : ''}</p>
-  <span class="inline-block mt-2 px-2 py-1 text-xs ${book.available ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'} rounded">
-    ${book.available ? 'Verfügbar' : 'Nicht verfügbar'}
-  </span>
-`;
+      // Login Formular absenden
+      loginForm.addEventListener("submit", async e => {
+        e.preventDefault();
+        try {
+          await signInWithEmailAndPassword(auth, loginForm.email.value, loginForm.password.value);
+        } catch (error) {
+          alert("Login fehlgeschlagen: " + error.message);
+        }
+      });
 
-    // Formular anzeigen und Buchtitel setzen
-    card.addEventListener("click", () => {
-      document.getElementById("book-title-input").value = book.title;
-      document.getElementById("borrow-section").style.display = "block";
-      document.getElementById("borrow-section").scrollIntoView({ behavior: "smooth" });
-    });
-    container.appendChild(card);
-  });
-}
+      // Auth-Status prüfen
+      onAuthStateChanged(auth, user => {
+        if (user) {
+          loginForm.style.display = "none";
+          adminPanel.style.display = "block";
+          loadBooks();
+        } else {
+          loginForm.style.display = "block";
+          adminPanel.style.display = "none";
+        }
+      });
 
+      // Bücher laden
+      async function loadBooks() {
+        booksContainer.innerHTML = "Lade Bücher...";
+        try {
+          const snap = await getDocs(collection(db, "books"));
+          booksContainer.innerHTML = "";
+          if (snap.empty) {
+            booksContainer.innerHTML = "<p>Keine Bücher gefunden.</p>";
+            return;
+          }
 
-    async function loadSiteTexts() {
-      const docRef = doc(db, "settings", "siteContent");
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        document.getElementById("header-text").textContent = data.headerText || "📚 Gemeindebibliothek";
-        document.getElementById("footer-text").textContent = data.footerText || "© 2025 Gemeindebibliothek – DITIB Jugend Kreis Unna";
-        document.getElementById("thank-you-message").textContent = data.thankYouMessage || "Vielen Dank! Deine Buchungsanfrage wurde erfolgreich übermittelt. Du wirst bald informiert, ob das Buch zur gewünschten Zeit verfügbar ist.";
+          snap.forEach(d => {
+            const data = d.data();
+            booksContainer.innerHTML += `
+              <div onclick="fillBookForm('${d.id}')">
+                <strong>${data.title}</strong> (${data.available ? "✓ Verfügbar" : "✗ Nicht verfügbar"})<br/>
+                Autor: ${data.author || "-"}<br/>
+                Verfügbar ab: ${data.availableFrom || "-"}<br/>
+                <img src="${data.cover || ''}" alt="Cover ${data.title}" style="max-width:100px; margin-top:5px;"/>
+              </div>
+            `;
+          });
+        } catch(e) {
+          booksContainer.innerHTML = "<p>Fehler beim Laden der Bücher.</p>";
+          console.error(e);
+        }
       }
-    }
-// Bücher laden
-async function loadBooks() {
-  booksContainer.innerHTML = "Lade Bücher...";
-  try {
-    const snap = await getDocs(collection(db, "books"));
-    booksContainer.innerHTML = "";
-    if (snap.empty) {
-      booksContainer.innerHTML = "<p>Keine Bücher gefunden.</p>";
-      return;
-    }
 
-    // Bücher durchlaufen und anzeigen
-    snap.forEach(d => {
-      const data = d.data();
-      booksContainer.innerHTML += `
-        <div style="background-color: ${data.reserved ? '#ffdddd' : 'white'};">
-          <strong>${data.title}</strong> (${data.available ? "✓ Verfügbar" : "✗ Nicht verfügbar"})<br/>
-          Autor: ${data.author || "-"}<br/>
-          Verfügbar ab: ${data.availableFrom || "-"}<br/>
-          <img src="${data.cover || ''}" alt="Cover ${data.title}" style="max-width:100px; margin-top:5px;"/>
-          
-          <br/><label>Verfügbar ab ändern:
-          <input type="date" value="${data.availableFrom || ''}" id="date-${d.id}" />
-          <button onclick="updateAvailableFrom('${d.id}')">Datum aktualisieren</button>
-          </label>
+      // Buchdetails in das Formular einfügen, wenn ein Buch geklickt wird
+      window.fillBookForm = function(bookId) {
+        // Buch mit der ID laden
+        const bookRef = doc(db, "books", bookId);
+        getDoc(bookRef).then(docSnap => {
+          if (docSnap.exists()) {
+            const bookData = docSnap.data();
+            bookForm.title.value = bookData.title || "";
+            bookForm.author.value = bookData.author || "";
+            bookForm.cover.value = bookData.cover || "";
+            bookForm.available.checked = bookData.available || false;
+            bookForm.availableFrom.value = bookData.availableFrom || "";
+          }
+        }).catch(err => {
+          alert("Fehler beim Laden der Buchdaten: " + err.message);
+        });
+      };
 
-          <br/><button onclick="toggleReservedStatus('${d.id}')">${data.reserved ? "Zurücksetzen" : "Reservieren"}</button>
-        </div>
-      `;
-    });
-
-  } catch(e) {
-    booksContainer.innerHTML = "<p>Fehler beim Laden der Bücher.</p>";
-    console.error(e);
-  }
-}
-
-    function showThankYouMessageIfNeeded() {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("success") === "1") {
-        document.getElementById("thank-you-message").classList.remove("hidden");
-        document.getElementById("thank-you-message").scrollIntoView({ behavior: "smooth" });
-      }
-    }
-
-    // Initiale Ausführung
-    window.addEventListener("load", () => {
-      loadBooks();
-      loadSiteTexts();
-      showThankYouMessageIfNeeded();
+      // Buch hinzufügen
+      bookForm.addEventListener("submit", async e => {
+        e.preventDefault();
+        try {
+          await addDoc(collection(db, "books"), {
+            title: bookForm.title.value,
+            author: bookForm.author.value,
+            cover: bookForm.cover.value,
+            available: bookForm.available.checked,
+            availableFrom: bookForm.availableFrom.value,
+            createdAt: serverTimestamp()
+          });
+          bookForm.reset();
+          loadBooks();
+        } catch (e) {
+          alert("Fehler beim Hinzufügen des Buches: " + e.message);
+        }
+      });
     });
   </script>
+
 </body>
 </html>
+
