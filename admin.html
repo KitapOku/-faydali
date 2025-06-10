@@ -36,35 +36,20 @@
   </form>
 
   <div id="admin-panel">
-  <h2>Bücher verwalten</h2>
+    <h2>Bücher verwalten</h2>
 
-  <!-- Buchformular für das Hinzufügen neuer Bücher -->
-  <form id="book-form">
-    <input name="title" type="text" placeholder="Titel" required />
-    <input name="author" type="text" placeholder="Autor" />
-    <input name="cover" type="text" placeholder="Cover-URL" />
-    <label><input name="available" type="checkbox" /> Verfügbar</label>
-    <input name="availableFrom" type="date" />
-    <button type="submit">Buch hinzufügen</button>
-  </form>
-
-  <!-- Bücher werden hier dynamisch geladen -->
-  <div id="books"></div>
-</div>
-
+    <!-- Buchformular für das Hinzufügen neuer Bücher -->
+    <form id="book-form">
+      <input name="title" type="text" placeholder="Titel" required />
+      <input name="author" type="text" placeholder="Autor" />
+      <input name="cover" type="text" placeholder="Cover-URL" />
+      <label><input name="available" type="checkbox" /> Verfügbar</label>
+      <input name="availableFrom" type="date" />
+      <button type="submit">Buch hinzufügen</button>
     </form>
-    
-    <div id="books">
-      <!-- Bücherliste wird hier geladen -->
-    </div>
 
-    <h2>Einstellungen</h2>
-    <form id="settings-form">
-      <textarea name="thankYouMessage" placeholder="Dankesnachricht"></textarea>
-      <input name="headerText" type="text" placeholder="Header-Text" />
-      <input name="footerText" type="text" placeholder="Footer-Text" />
-      <button type="submit">Einstellungen speichern</button>
-    </form>
+    <!-- Bücher werden hier dynamisch geladen -->
+    <div id="books"></div>
   </div>
 
   <script type="module">
@@ -104,40 +89,11 @@
           alert("Login fehlgeschlagen: " + error.message);
         }
       });
-      
-
-window.updateAvailableFrom = async function(bookId) {
-  const dateInput = document.getElementById(`date-${bookId}`);
-  const newDate = dateInput.value;
-  
-  if (!newDate) {
-    alert("Bitte ein gültiges Datum auswählen.");
-    return;
-  }
-
-  try {
-    const bookRef = doc(db, "books", bookId);
-    // Das Datum wird jetzt korrekt mit der Option 'merge' aktualisiert
-    await setDoc(bookRef, { availableFrom: newDate }, { merge: true });
-    alert("Datum erfolgreich aktualisiert.");
-    loadBooks();  // Laden der Bücher, um die Änderungen anzuzeigen
-  } catch (error) {
-    alert("Fehler beim Aktualisieren des Datums: " + error.message);
-  }
-};
-
-  try {
-    const bookRef = doc(db, "books", bookId);
-    await setDoc(bookRef, { availableFrom: newDate }, { merge: true });
-    alert("Datum erfolgreich aktualisiert.");
-    loadBooks();
-  } catch (error) {
-    alert("Fehler beim Aktualisieren des Datums: " + error.message);
-  }
-};
 
       // Auth-Status prüfen
       onAuthStateChanged(auth, user => {
+        console.log("Auth-Status geändert:", user); // Debugging-Statement
+
         if (user) {
           loginForm.style.display = "none";
           adminPanel.style.display = "block";
@@ -159,22 +115,18 @@ window.updateAvailableFrom = async function(bookId) {
             booksContainer.innerHTML = "<p>Keine Bücher gefunden.</p>";
             return;
           }
-         snap.forEach(d => {
-  const data = d.data();
-  booksContainer.innerHTML += `
-    <div>
-      <strong>${data.title}</strong> (${data.available ? "✓ Verfügbar" : "✗ Nicht verfügbar"})<br/>
-      Autor: ${data.author || "-"}<br/>
-      Verfügbar ab: ${data.availableFrom || "-"}<br/>
-      <img src="${data.cover || ''}" alt="Cover ${data.title}" style="max-width:100px; margin-top:5px;"/>
 
-      <br/><label>Verfügbar ab ändern:
-      <input type="date" value="${data.availableFrom || ''}" id="date-${d.id}" />
-      <button onclick="updateAvailableFrom('${d.id}')">Datum aktualisieren</button>
-      </label>
-    </div>
-  `;
-});
+          snap.forEach(d => {
+            const data = d.data();
+            booksContainer.innerHTML += `
+              <div>
+                <strong>${data.title}</strong> (${data.available ? "✓ Verfügbar" : "✗ Nicht verfügbar"})<br/>
+                Autor: ${data.author || "-"}<br/>
+                Verfügbar ab: ${data.availableFrom || "-"}<br/>
+                <img src="${data.cover || ''}" alt="Cover ${data.title}" style="max-width:100px; margin-top:5px;"/>
+              </div>
+            `;
+          });
 
         } catch(e) {
           booksContainer.innerHTML = "<p>Fehler beim Laden der Bücher.</p>";
@@ -211,26 +163,8 @@ window.updateAvailableFrom = async function(bookId) {
             settingsForm.headerText.value = data.headerText || "";
             settingsForm.footerText.value = data.footerText || "";
           }
-
-window.toggleReservedStatus = async function(bookId) {
-  const bookRef = doc(db, "books", bookId);
-  const bookSnapshot = await getDoc(bookRef);
-  
-  if (!bookSnapshot.exists()) {
-    alert("Buch nicht gefunden.");
-    return;
-  }
-
-  const currentReservedStatus = bookSnapshot.data().reserved || false;
-  try {
-    await setDoc(bookRef, { reserved: !currentReservedStatus }, { merge: true });
-    alert(`Buch wurde ${!currentReservedStatus ? "reserviert" : "zurückgesetzt"}.`);
-    loadBooks();  // Bücher neu laden, um die Änderung anzuzeigen
-  } catch (error) {
-    alert("Fehler beim Aktualisieren des Reservierungsstatus: " + error.message);
-  }
-};
-
+        } catch (e) {
+          console.error("Fehler beim Laden der Einstellungen:", e);
         }
       }
 
