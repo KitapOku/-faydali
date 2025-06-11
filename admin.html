@@ -127,56 +127,60 @@
             booksContainer.appendChild(div);
           });
 
-          // Toggle Verfügbarkeit
-          booksContainer.querySelectorAll(".toggle-available").forEach(input => {
-            input.addEventListener("change", async e => {
-              const buchId = e.target.dataset.id;
-              const newStatus = e.target.checked;
-              await updateDoc(doc(db, "books", buchId), {
-                available: newStatus
-              });
-              loadBooks();
+         function attachListeners() {
+      booksContainer.querySelectorAll(".toggle-available").forEach(input => {
+        input.addEventListener("change", async e => {
+          console.log("Verfügbarkeit geändert");
+          const buchId = e.target.dataset.id;
+          const newStatus = e.target.checked;
+          try {
+            await updateDoc(doc(db, "books", buchId), {
+              available: newStatus
             });
-          });
-
-          // Datum aktualisieren
-          booksContainer.querySelectorAll(".update-date").forEach(input => {
-            input.addEventListener("change", async e => {
-              const buchId = e.target.dataset.id;
-              const newDate = e.target.value;
-              await updateDoc(doc(db, "books", buchId), {
-                availableFrom: newDate
-              });
-              loadBooks();
-            });
-          });
-
-        } catch(e) {
-          booksContainer.innerHTML = "<p>Fehler beim Laden der Bücher.</p>";
-          console.error(e);
-        }
-      }
-
-      bookForm.addEventListener("submit", async e => {
-        e.preventDefault();
-        try {
-          await addDoc(collection(db, "books"), {
-            title: bookForm.title.value,
-            author: bookForm.author.value,
-            cover: bookForm.cover.value,
-            available: bookForm.available.checked,
-            availableFrom: bookForm.availableFrom.value,
-            createdAt: serverTimestamp()
-          });
-          bookForm.reset();
-          loadBooks();
-        } catch (e) {
-          alert("Fehler beim Hinzufügen des Buches: " + e.message);
-        }
+            loadBooks();
+          } catch (err) {
+            console.error("Fehler beim Aktualisieren der Verfügbarkeit:", err);
+          }
+        });
       });
-    });
-  </script>
 
+      booksContainer.querySelectorAll(".update-date").forEach(input => {
+        input.addEventListener("change", async e => {
+          console.log("Datum geändert");
+          const buchId = e.target.dataset.id;
+          const newDate = e.target.value;
+          try {
+            await updateDoc(doc(db, "books", buchId), {
+              availableFrom: newDate
+            });
+            loadBooks();
+          } catch (err) {
+            console.error("Fehler beim Aktualisieren des Datums:", err);
+          }
+        });
+      });
+    }
+
+    bookForm.addEventListener("submit", async e => {
+      e.preventDefault();
+      try {
+        await addDoc(collection(db, "books"), {
+          title: bookForm.title.value,
+          author: bookForm.author.value,
+          cover: bookForm.cover.value,
+          available: bookForm.available.checked,
+          availableFrom: bookForm.availableFrom.value,
+          createdAt: serverTimestamp()
+        });
+        bookForm.reset();
+        loadBooks();
+      } catch (e) {
+        alert("Fehler beim Hinzufügen des Buches: " + e.message);
+      }
+    });
+  });
+</script>
+  
 </body>
 </html>
 
