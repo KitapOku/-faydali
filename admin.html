@@ -54,25 +54,8 @@
       <button type="submit">Buch hinzufügen</button>
     </form>
 
-  const coverInput = bookForm.cover;
-const coverPreview = document.getElementById("cover-preview");
-
-coverInput.addEventListener("input", () => {
-  const url = coverInput.value.trim();
-  if (url) {
-    coverPreview.src = url;
-    coverPreview.style.display = "block";
-  } else {
-    coverPreview.src = "";
-    coverPreview.style.display = "none";
-  }
-});
-    
     <div id="books"></div>
   </div>
-
-
-
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
@@ -99,6 +82,20 @@ coverInput.addEventListener("input", () => {
       const bookForm = document.getElementById("book-form");
       const booksContainer = document.getElementById("books");
 
+      // Bildvorschau-Logik
+      const coverInput = bookForm.cover;
+      const coverPreview = document.getElementById("cover-preview");
+      coverInput.addEventListener("input", () => {
+        const url = coverInput.value.trim();
+        if (url) {
+          coverPreview.src = url;
+          coverPreview.style.display = "block";
+        } else {
+          coverPreview.src = "";
+          coverPreview.style.display = "none";
+        }
+      });
+
       loginForm.addEventListener("submit", async e => {
         e.preventDefault();
         try {
@@ -108,7 +105,6 @@ coverInput.addEventListener("input", () => {
         }
       });
 
-      
       onAuthStateChanged(auth, user => {
         if (user) {
           console.log("FgmtHLH2jEWNNafuGWEMUQt8kIn2", user.uid); // UID zur Kontrolle
