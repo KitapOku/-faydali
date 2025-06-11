@@ -97,7 +97,8 @@ async function loadBooks() {
       : '';
 
     card.innerHTML = `
-      <img src="${book.cover || 'https://via.placeholder.com/150x220?text=Kein+Cover'}" alt="Buchcover" class="rounded mb-2 w-full h-auto max-h-56 object-cover" />
+      <img src="${book.cover || 'https://via.placeholder.com/150x220?text=Kein+Cover'}" alt="Buchcover" class="rounded mb-2 w-full h-auto max-h-56 object-contain bg-white" />
+
       <h3 class="text-lg font-bold">${book.title}</h3>
       <p class="text-sm">Autor: ${book.author}</p>
       <p class="text-sm text-gray-700">${availableFromText}</p>
