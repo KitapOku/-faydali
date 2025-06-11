@@ -56,108 +56,17 @@
   </main>
 
   <footer class="bg-white p-4 mt-10 text-center text-sm text-gray-500">
-    <span id="footer-text">© 2025 Gemeindebibliothek – DITIB Jugend Kreis Unna - by Bahadir Büyük</span>
-  <img src="https://pplx-res.cloudinary.com/image/upload/v1749677191/gpt4o_images/jgnwbt88ilrecvnwpx5l.png" alt="Byk" class="mx-auto block w-20 h-auto mb-2" />
-  </footer>
-  
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>
-    AOS.init();
-  </script>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBBGhn-V58ufgbSGsoL6lLONX09QJKm2sE",
-      authDomain: "bibliothek-38373.firebaseapp.com",
-      projectId: "bibliothek-38373",
-      storageBucket: "bibliothek-38373.firebasestorage.app",
-      messagingSenderId: "188405615349",
-      appId: "1:188405615349:web:715db2a75ea95cc0c6d3bc",
-      measurementId: "G-NR98T0L5RW"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-async function loadBooks() {
-  const container = document.getElementById("books-container");
-  container.innerHTML = "";
-
-  const querySnapshot = await getDocs(collection(db, "books"));
-  querySnapshot.forEach(docSnap => {
-    const book = docSnap.data();
-    const card = document.createElement("div");
-    card.className = "bg-white p-4 rounded-xl shadow hover:shadow-md transition cursor-pointer";
-
-    const availableFromText = book.availableFrom
-      ? 'Verfügbar ab: ' + new Date(book.availableFrom).toLocaleDateString("de-DE")
-      : '';
-
-    card.innerHTML = `
-      <img src="${book.cover || 'https://via.placeholder.com/150x220?text=Kein+Cover'}" alt="Buchcover" class="rounded mb-2 w-full h-auto max-h-56 object-contain bg-white" />
-
-      <h3 class="text-lg font-bold">${book.title}</h3>
-      <p class="text-sm">Autor: ${book.author}</p>
-      <p class="text-sm text-gray-700">${availableFromText}</p>
-      <span class="inline-block mt-2 px-2 py-1 text-xs ${book.available ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'} rounded">
-        ${book.available ? 'Verfügbar' : 'Nicht verfügbar'}
-      </span>
-    `;
-  
-    // Formular anzeigen und Buchtitel setzen
-    card.addEventListener("click", () => {
-      document.getElementById("book-title-input").value = book.title;
-      document.getElementById("borrow-section").style.display = "block";
-      document.getElementById("borrow-section").scrollIntoView({ behavior: "smooth" });
-    });
-
-    container.appendChild(card);
-  });
-}
-
-    async function loadSiteTexts() {
-      const docRef = doc(db, "settings", "siteContent");
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        document.getElementById("header-text").textContent = data.headerText || "📚 Gemeindebibliothek";
-        document.getElementById("footer-text").textContent = data.footerText || "© 2025 Gemeindebibliothek – DITIB Jugend Kreis Unna";
-        document.getElementById("thank-you-message").textContent = data.thankYouMessage || "Vielen Dank! Deine Buchungsanfrage wurde erfolgreich übermittelt. Du wirst bald informiert, ob das Buch zur gewünschten Zeit verfügbar ist.";
-      }
-    }
-
-    function showThankYouMessageIfNeeded() {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("success") === "1") {
-        document.getElementById("thank-you-message").classList.remove("hidden");
-        document.getElementById("thank-you-message").scrollIntoView({ behavior: "smooth" });
-      }
-    }
-
-    // Initiale Ausführung
-    window.addEventListener("load", () => {
-      loadBooks();
-      loadSiteTexts();
-      showThankYouMessageIfNeeded();
-    });
-
-<!-- Footer mit Link -->
-<footer>
-  <p>
-    &copy; 2025 Meine Bibliothek |
-    <a href="#" onclick="openPopup(); return false;">Datenschutzerklärung</a>
-  </p>
+  <span id="footer-text">© 2025 Gemeindebibliothek – DITIB Jugend Kreis Unna - by Bahadir Büyük</span>
+  <img src="..." alt="Byk" class="mx-auto block w-20 h-auto mb-2" />
+  | <a href="#" onclick="openPopup(); return false;">Datenschutzerklärung</a>
 </footer>
 
 <!-- Das Pop-up (initial versteckt) -->
 <div id="datenschutzPopup" style="display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); width:80%; max-width:600px; background:#fff; border:1px solid #ccc; padding:20px; z-index:1000;">
   <h2>Datenschutzerklärung</h2>
   <p>
-    <Datenschutzerklärung
-Zuletzt aktualisiert: [Aktuelles Datum einfügen]
+    Datenschutzerklärung
+Zuletzt aktualisiert: [12.06.2025]
 
 1. Verantwortlicher und Kontaktdaten
 Verantwortlich für diese Website ist:
@@ -271,6 +180,9 @@ Erweiterungen: Falls Sie später Funktionen wie Kontaktformulare, Newsletter ode
 
 Rechtlicher Hinweis: Diese Vorlage ersetzt keine rechtliche Beratung. Bei Unsicherheiten sollten Sie einen Datenschutzexperten oder Rechtsanwalt konsultieren.
 
+Firebase Hosting - Datenschutzerklärung Ergänzung
+Zusätzliche Angaben für Firebase Hosting
+Wenn Sie Firebase Hosting verwenden, müssen Sie Ihre Datenschutzerklärung um folgende Punkte ergänzen:
 
 Firebase Hosting (Google)
 Wir nutzen Firebase Hosting, einen Webhosting-Dienst der Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA („Google") zur Bereitstellung unserer Website.
@@ -306,9 +218,10 @@ Firebase Datenschutzhinweise: https://firebase.google.com/support/privacy
   <button onclick="closePopup()">Schließen</button>
 </div>
 
-<!-- Halbtransparenter Hintergrund -->
+<!-- Overlay -->
 <div id="popupOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;" onclick="closePopup()"></div>
 
+<!-- Popup-JavaScript -->
 <script>
 function openPopup() {
   document.getElementById('datenschutzPopup').style.display = 'block';
@@ -319,6 +232,91 @@ function closePopup() {
   document.getElementById('popupOverlay').style.display = 'none';
 }
 </script>
+
+  
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init();
+  </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBBGhn-V58ufgbSGsoL6lLONX09QJKm2sE",
+      authDomain: "bibliothek-38373.firebaseapp.com",
+      projectId: "bibliothek-38373",
+      storageBucket: "bibliothek-38373.firebasestorage.app",
+      messagingSenderId: "188405615349",
+      appId: "1:188405615349:web:715db2a75ea95cc0c6d3bc",
+      measurementId: "G-NR98T0L5RW"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+async function loadBooks() {
+  const container = document.getElementById("books-container");
+  container.innerHTML = "";
+
+  const querySnapshot = await getDocs(collection(db, "books"));
+  querySnapshot.forEach(docSnap => {
+    const book = docSnap.data();
+    const card = document.createElement("div");
+    card.className = "bg-white p-4 rounded-xl shadow hover:shadow-md transition cursor-pointer";
+
+    const availableFromText = book.availableFrom
+      ? 'Verfügbar ab: ' + new Date(book.availableFrom).toLocaleDateString("de-DE")
+      : '';
+
+    card.innerHTML = `
+      <img src="${book.cover || 'https://via.placeholder.com/150x220?text=Kein+Cover'}" alt="Buchcover" class="rounded mb-2 w-full h-auto max-h-56 object-contain bg-white" />
+
+      <h3 class="text-lg font-bold">${book.title}</h3>
+      <p class="text-sm">Autor: ${book.author}</p>
+      <p class="text-sm text-gray-700">${availableFromText}</p>
+      <span class="inline-block mt-2 px-2 py-1 text-xs ${book.available ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'} rounded">
+        ${book.available ? 'Verfügbar' : 'Nicht verfügbar'}
+      </span>
+    `;
+  
+    // Formular anzeigen und Buchtitel setzen
+    card.addEventListener("click", () => {
+      document.getElementById("book-title-input").value = book.title;
+      document.getElementById("borrow-section").style.display = "block";
+      document.getElementById("borrow-section").scrollIntoView({ behavior: "smooth" });
+    });
+
+    container.appendChild(card);
+  });
+}
+
+    async function loadSiteTexts() {
+      const docRef = doc(db, "settings", "siteContent");
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        document.getElementById("header-text").textContent = data.headerText || "📚 Gemeindebibliothek";
+        document.getElementById("footer-text").textContent = data.footerText || "© 2025 Gemeindebibliothek – DITIB Jugend Kreis Unna";
+        document.getElementById("thank-you-message").textContent = data.thankYouMessage || "Vielen Dank! Deine Buchungsanfrage wurde erfolgreich übermittelt. Du wirst bald informiert, ob das Buch zur gewünschten Zeit verfügbar ist.";
+      }
+    }
+
+    function showThankYouMessageIfNeeded() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("success") === "1") {
+        document.getElementById("thank-you-message").classList.remove("hidden");
+        document.getElementById("thank-you-message").scrollIntoView({ behavior: "smooth" });
+      }
+    }
+
+    // Initiale Ausführung
+    window.addEventListener("load", () => {
+      loadBooks();
+      loadSiteTexts();
+      showThankYouMessageIfNeeded();
+    });
 
     
   </script>
