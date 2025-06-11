@@ -117,17 +117,6 @@ async function loadBooks() {
   });
 }
 
-    // Formular anzeigen und Buchtitel setzen
-    card.addEventListener("click", () => {
-      document.getElementById("book-title-input").value = book.title;
-      document.getElementById("borrow-section").style.display = "block";
-      document.getElementById("borrow-section").scrollIntoView({ behavior: "smooth" });
-    });
-    container.appendChild(card);
-  });
-}
-
-
     async function loadSiteTexts() {
       const docRef = doc(db, "settings", "siteContent");
       const docSnap = await getDoc(docRef);
